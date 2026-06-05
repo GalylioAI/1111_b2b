@@ -1,26 +1,237 @@
 @import "tailwindcss";
 
+/* next-themes uses a `class` on <html>; make Tailwind's dark variant class-based */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ----------------------------------------------------------------------------
+   Design tokens — light is the default, .dark overrides.
+   These power every surface so the whole app cross-fades on theme switch.
+---------------------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --app: #f5f6f9;
+  --surface: #ffffff;
+  --surface-2: #f1f3f7;
+  --surface-3: #e9ecf2;
+  --rail: #ffffff;
+
+  --line: rgba(17, 24, 39, 0.07);
+  --line-2: rgba(17, 24, 39, 0.12);
+
+  --ink: #1d2230;
+  --ink-2: #626a7a;
+  --ink-3: #9aa1af;
+
+  --accent: #49885b;
+  --accent-2: #5ea372;
+  --accent-3: #9fcfa9;
+  --accent-soft: rgba(73, 136, 91, 0.12);
+  --accent-glow: rgba(73, 136, 91, 0.3);
+
+  --good: #22c993;
+  --warn: #f7a23b;
+  --danger: #f76b6b;
+
+  --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.04), 0 1px 3px rgba(17, 24, 39, 0.06);
+  --shadow-md: 0 10px 30px -14px rgba(17, 24, 39, 0.22);
+  --shadow-lg: 0 28px 60px -28px rgba(17, 24, 39, 0.28);
+
+  --radius: 18px;
 }
 
+.dark {
+  --app: #14161e;
+  --surface: #1b1e28;
+  --surface-2: #23273380;
+  --surface-3: #2b3040;
+  --rail: #101119;
+
+  --line: rgba(255, 255, 255, 0.06);
+  --line-2: rgba(255, 255, 255, 0.1);
+
+  --ink: #f3f4f8;
+  --ink-2: #a6abba;
+  --ink-3: #6c7184;
+
+  --accent: #52946a;
+  --accent-2: #6fb487;
+  --accent-3: #a9d6b6;
+  --accent-soft: rgba(82, 148, 106, 0.18);
+  --accent-glow: rgba(82, 148, 106, 0.42);
+
+  --good: #2fd99e;
+  --warn: #ffb14d;
+  --danger: #ff7a7a;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 16px 40px -18px rgba(0, 0, 0, 0.65);
+  --shadow-lg: 0 30px 70px -28px rgba(0, 0, 0, 0.8);
+}
+
+/* Map tokens into Tailwind's theme so utilities like bg-surface / text-ink work */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-app: var(--app);
+  --color-surface: var(--surface);
+  --color-surface2: var(--surface-2);
+  --color-surface3: var(--surface-3);
+  --color-rail: var(--rail);
+
+  --color-line: var(--line);
+  --color-line2: var(--line-2);
+
+  --color-ink: var(--ink);
+  --color-ink2: var(--ink-2);
+  --color-ink3: var(--ink-3);
+
+  --color-accent: var(--accent);
+  --color-accent2: var(--accent-2);
+  --color-accent3: var(--accent-3);
+  --color-accentsoft: var(--accent-soft);
+
+  --color-good: var(--good);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-poppins), var(--font-inter), sans-serif;
+
+  --radius-xl2: var(--radius);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--line);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--app);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
+
+/* Smooth token transitions on the surfaces that change between themes */
+.themed {
+  transition: background-color 0.5s ease, border-color 0.5s ease,
+    color 0.5s ease, box-shadow 0.5s ease;
+}
+
+::selection {
+  background: var(--accent-glow);
+  color: var(--ink);
+}
+
+/* Sleek custom scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-3) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--surface-3);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-3);
+}
+
+/* ----------------------------------------------------------------------------
+   Reusable component classes
+---------------------------------------------------------------------------- */
+@layer components {
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    transition: background-color 0.5s ease, border-color 0.5s ease,
+      box-shadow 0.35s ease, transform 0.35s ease;
+  }
+  .card-hover:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-3px);
+    border-color: var(--line-2);
+  }
+
+  .inset {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+
+  .pill {
+    border-radius: 999px;
+  }
+
+  .accent-text {
+    color: var(--accent);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .accent-gradient {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  }
+
+  .ring-soft {
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   Keyframes
+---------------------------------------------------------------------------- */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  70% { transform: scale(1.4); opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-spin-slow { animation: spin-slow 14s linear infinite; }
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 0%,
+    var(--surface-3) 40%,
+    var(--surface-2) 80%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s infinite linear;
+}
+
+/* Recharts: kill the default focus outline on the wrapper */
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none;
+}
+.recharts-cartesian-grid line {
+  stroke: var(--line);
+}
+.recharts-text { fill: var(--ink-3); }
