@@ -1,0 +1,49 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { ArrowUpRight, ArrowDownRight } from "lucide-react";
+
+export function KpiCard({
+  label,
+  value,
+  delta,
+  up,
+  index = 0,
+}: {
+  label: string;
+  value: string;
+  delta: string;
+  up: boolean;
+  index?: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+      className="card card-hover relative overflow-hidden p-5"
+    >
+      <span className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-accent/10 blur-2xl" />
+      <p className="text-xs font-medium uppercase tracking-wider text-ink3">
+        {label}
+      </p>
+      <p className="mt-2 font-display text-[26px] font-bold tracking-tight text-ink">
+        {value}
+      </p>
+      <span
+        className={`mt-3 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
+          up
+            ? "bg-good/10 text-good"
+            : "bg-danger/10 text-danger"
+        }`}
+      >
+        {up ? (
+          <ArrowUpRight className="h-3.5 w-3.5" />
+        ) : (
+          <ArrowDownRight className="h-3.5 w-3.5" />
+        )}
+        {delta}
+      </span>
+    </motion.div>
+  );
+}
