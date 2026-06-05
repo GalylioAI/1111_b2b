@@ -119,9 +119,49 @@ class LineSeries {
   const LineSeries(this.values, this.color, {this.dashed = false, this.fill = false});
 }
 
+/// "Nice number" rounding for axis bounds/ticks (Heckbert's algorithm).
+double _niceNum(double range, {required bool round}) {
+  if (range <= 0) return 1;
+  final exp = (log(range) / ln10).floorToDouble();
+  final f = range / pow(10, exp);
+  final double nf = round
+      ? (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10)
+      : (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10);
+  return nf * pow(10, exp);
+}
+
+/// Computes vertical-axis bounds and evenly-spaced ticks that always contain
+/// the data, so the labels can never disagree with the plotted line.
+({double minY, double maxY, List<double> ticks}) _autoAxis(List<LineSeries> series) {
+  double mn = double.infinity, mx = -double.infinity;
+  for (final s in series) {
+    for (final v in s.values) {
+      if (v < mn) mn = v;
+      if (v > mx) mx = v;
+    }
+  }
+  if (mn == double.infinity) return (minY: 0, maxY: 1, ticks: const [0, 1]);
+  if (mn == mx) {
+    final pad = mn == 0 ? 1.0 : mn.abs() * 0.1;
+    mn -= pad;
+    mx += pad;
+  }
+  final spacing = _niceNum(_niceNum(mx - mn, round: false) / 4, round: true);
+  final niceMin = (mn / spacing).floor() * spacing;
+  final niceMax = (mx / spacing).ceil() * spacing;
+  final ticks = <double>[];
+  for (double t = niceMin; t <= niceMax + spacing * 0.5; t += spacing) {
+    ticks.add(double.parse(t.toStringAsFixed(6)));
+  }
+  return (minY: niceMin, maxY: niceMax, ticks: ticks);
+}
+
 class AreaLineChart extends StatefulWidget {
   final List<LineSeries> series;
-  final double minY, maxY;
+
+  /// Optional explicit bounds/ticks. When any is omitted the axis is derived
+  /// from the data so it always matches the plotted values.
+  final double? minY, maxY;
   final List<String> xLabels;
   final List<double> yTicks;
   final List<String> seriesLabels;
@@ -130,8 +170,8 @@ class AreaLineChart extends StatefulWidget {
   const AreaLineChart({
     super.key,
     required this.series,
-    required this.minY,
-    required this.maxY,
+    this.minY,
+    this.maxY,
     this.xLabels = const [],
     this.yTicks = const [],
     this.seriesLabels = const [],
@@ -164,6 +204,15 @@ class _AreaLineChartState extends State<AreaLineChart> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    // Derive bounds/ticks from the data unless every value is supplied, so the
+    // vertical labels always contain (and match) the plotted series.
+    final bool useAuto = widget.minY == null || widget.maxY == null || widget.yTicks.isEmpty;
+    final axis = useAuto
+        ? _autoAxis(widget.series)
+        : (minY: widget.minY!, maxY: widget.maxY!, ticks: widget.yTicks);
+    final spacing = axis.ticks.length >= 2 ? (axis.ticks[1] - axis.ticks[0]).abs() : 1.0;
+    final tickDecimals = spacing >= 1 ? 0 : (spacing >= 0.1 ? 1 : 2);
+
     return SizedBox(
       height: widget.height,
       child: LayoutBuilder(builder: (ctx, con) {
@@ -178,8 +227,8 @@ class _AreaLineChartState extends State<AreaLineChart> with SingleTickerProvider
             builder: (_, _) => CustomPaint(
               size: Size.infinite,
               painter: _AreaPainter(
-                widget.series, widget.minY, widget.maxY, widget.xLabels, widget.yTicks,
-                widget.seriesLabels, widget.decimals, context.c,
+                widget.series, axis.minY, axis.maxY, widget.xLabels, axis.ticks,
+                widget.seriesLabels, widget.decimals, tickDecimals, context.c,
                 Curves.easeOutCubic.transform(_c.value), _sel,
               ),
             ),
@@ -197,10 +246,11 @@ class _AreaPainter extends CustomPainter {
   final List<double> yTicks;
   final List<String> seriesLabels;
   final int decimals;
+  final int tickDecimals;
   final AppColors c;
   final double p;
   final int? sel;
-  _AreaPainter(this.series, this.minY, this.maxY, this.xLabels, this.yTicks, this.seriesLabels, this.decimals, this.c, this.p, this.sel);
+  _AreaPainter(this.series, this.minY, this.maxY, this.xLabels, this.yTicks, this.seriesLabels, this.decimals, this.tickDecimals, this.c, this.p, this.sel);
 
   static const double padL = 38, padB = 22, padT = 6, padR = 6;
 
@@ -217,12 +267,20 @@ class _AreaPainter extends CustomPainter {
     for (final t in yTicks) {
       final y = yOf(t);
       canvas.drawLine(Offset(padL, y), Offset(size.width - padR, y), gridPaint);
-      _text(canvas, t.toStringAsFixed(0), Offset(0, y - 6), c.ink3, 10);
+      _text(canvas, _fmt(t, tickDecimals), Offset(0, y - 6), c.ink3, 10);
     }
     if (xLabels.isNotEmpty) {
+      // Draw labels left-to-right, skipping any that would overlap the previous
+      // one, so the horizontal axis stays readable at any point count.
+      double lastRight = double.negativeInfinity;
       for (int i = 0; i < xLabels.length; i++) {
+        if (xLabels[i].isEmpty) continue;
+        final tp = _tp(xLabels[i], c.ink3, 10, FontWeight.w400);
         final x = xOf(i, xLabels.length);
-        _text(canvas, xLabels[i], Offset(x - 8, size.height - 14), c.ink3, 10);
+        final left = (x - tp.width / 2).clamp(0.0, size.width - tp.width);
+        if (left < lastRight + 6) continue;
+        tp.paint(canvas, Offset(left, size.height - 14));
+        lastRight = left + tp.width;
       }
     }
 

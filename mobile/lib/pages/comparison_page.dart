@@ -119,7 +119,8 @@ class ComparisonPage extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const CardTitle('Évolution des prix (14 jours)'),
               AreaLineChart(
-                minY: 4450, maxY: 4750, yTicks: const [4500, 4600, 4700], height: 210,
+                height: 210,
+                xLabels: [for (final h in comparisonHistory) 'J${h['day']}'],
                 seriesLabels: const ['Zoom', 'Tunisianet', 'Mytek'],
                 series: [
                   LineSeries([for (final h in comparisonHistory) h['Zoom'] as double], const Color(0xFFE11D74)),

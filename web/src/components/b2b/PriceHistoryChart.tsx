@@ -10,6 +10,7 @@ import {
   YAxis,
 } from "recharts";
 import { ClientOnly } from "@/components/ui/ClientOnly";
+import { niceAxis } from "@/lib/axis";
 import { sites } from "@/lib/b2b";
 
 type Row = Record<string, number>;
@@ -51,6 +52,7 @@ export function PriceHistoryChart({
   lines: string[];
   height?: number;
 }) {
+  const axis = niceAxis(data.flatMap((row) => lines.map((key) => row[key])));
   return (
     <div className="w-full" style={{ height }}>
       <ClientOnly>
@@ -63,7 +65,8 @@ export function PriceHistoryChart({
               axisLine={false}
               tick={{ fontSize: 11, fill: "var(--ink-3)" }}
               width={56}
-              domain={["dataMin - 60", "dataMax + 60"]}
+              domain={[axis.min, axis.max]}
+              ticks={axis.ticks}
               tickFormatter={(v) => `${(v / 1000).toFixed(1)}k`}
             />
             <Tooltip content={<HistTooltip />} cursor={{ stroke: "var(--accent)", strokeDasharray: "4 4", strokeOpacity: 0.4 }} />

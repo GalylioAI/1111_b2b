@@ -344,3 +344,117 @@ const plans = <Plan>[
   Plan('Business', 'Grandes enseignes', '399', ['Sites illimités', 'Intelligence SEO', 'Accès API REST', 'Multi-utilisateurs', 'Historique 2 ans'], false),
   Plan('Enterprise', 'Groupes / Agences', 'Sur devis', ['White-label', 'SLA garanti', 'Intégration ERP / PIM', 'Accompagnement dédié'], false),
 ];
+
+/* ----------------------------------------------------------------------------
+   Indices du marché — indicateurs d'intelligence calculés quotidiennement
+   à partir de plus de 15 000 SKUs e-commerce tunisiens.
+---------------------------------------------------------------------------- */
+
+class GlobalIndex {
+  final String title, subtitle, formula, description;
+  final double value, daily, weekly;
+  const GlobalIndex(this.title, this.subtitle, this.value, this.daily, this.weekly, this.formula, this.description);
+}
+
+const globalIndex = GlobalIndex(
+  'Indice du Marché E-Commerce Tunisien',
+  'Composite global',
+  112.4,
+  0.6,
+  2.1,
+  'Indice Global = 100 × (1 + (0.30·Inflation + 0.20·Volatilité + 0.20·Guerre + 0.15·Dispersion + 0.15·Renouv.))',
+  "Indicateur composite combinant inflation, volatilité, pression concurrentielle, dispersion des prix et rotation des produits en un score unique.",
+);
+
+// Série 30 jours pour le graphique vedette.
+final globalIndexSeries = List.generate(30, (i) {
+  final base = 107.5 + i * 0.17 + sin(i / 2.5) * 1.4 + cos(i / 6) * 0.7;
+  return {'day': i + 1, 'value': (base * 10).round() / 10};
+});
+
+class Indicator {
+  final String key, name, formula, value, description, definition;
+  final double change24h, change7d;
+  final List<double> spark;
+  final bool goodUp; // si vrai, une hausse est positive (vert)
+  const Indicator(this.key, this.name, this.formula, this.value, this.change24h,
+      this.change7d, this.description, this.definition, this.spark, this.goodUp);
+}
+
+// Série 9 pts interpolée linéairement entre start et end (avec léger bruit).
+List<double> _up(double start, double end, [int n = 9]) => List.generate(
+    n, (i) => ((start + (end - start) * (i / (n - 1)) + sin(i.toDouble()) * ((end - start).abs() * 0.06)) * 100).round() / 100);
+
+const _defPrice =
+    "Mesure l'évolution globale des prix de l'ensemble des produits suivis par rapport à la période de référence. Il offre une vue d'ensemble de l'évolution du niveau de prix du marché e-commerce dans le temps.";
+
+final indicators = <Indicator>[
+  Indicator('price', 'Indice Global des Prix', 'I(t) = (1/N) × Σ(Pi,t / Pi,0) × 100', '112.4', 0.6, 2.1,
+      'Évolution globale des prix du marché.', _defPrice, _up(108.2, 112.4), true),
+  Indicator('inflation', "Indice d'Inflation E-Commerce", 'π(t) = (I(t) − I(t−1)) / I(t−1)', '1.84%', 0.9, 4.2,
+      'Rythme de hausse ou de baisse des prix.',
+      "Mesure le rythme auquel les prix e-commerce augmentent ou diminuent entre deux périodes consécutives. Il agit comme un indicateur d'inflation propre au marché numérique.",
+      _up(1.42, 1.84), false),
+  Indicator('loginflation', "Indice d'Inflation Logarithmique", 'g(t) = (1/N) × Σ[ln(Pi,t) − ln(Pi,t−1)]', '1.62%', 0.7, 3.4,
+      'Inflation robuste via variations logarithmiques.',
+      "Version statistiquement robuste de la mesure d'inflation utilisant les variations logarithmiques des prix. Elle réduit l'impact des mouvements de prix extrêmes.",
+      _up(1.31, 1.62), false),
+  Indicator('volatility', 'Indice de Volatilité des Prix', 'V(t) = √[(1/N) × Σ(Ri,t − R̄)²]', '4.27', 2.1, -1.4,
+      'Instabilité et fluctuations des prix.',
+      'Mesure le degré de fluctuation des prix entre les produits. Des valeurs élevées indiquent un marché plus instable.',
+      const [3.9, 4.1, 4.4, 4.6, 4.5, 4.3, 4.2, 4.35, 4.27], false),
+  Indicator('dispersion', 'Indice de Dispersion des Prix', 'D(t) = σ(P) / μ(P)', '0.34', -0.5, 1.1,
+      'Écart des prix entre les produits.',
+      'Mesure à quel point les prix des produits sont dispersés autour de la moyenne. Une dispersion élevée suggère de grandes différences entre produits.',
+      const [0.33, 0.34, 0.35, 0.34, 0.36, 0.35, 0.34, 0.345, 0.34], false),
+  Indicator('pricewar', 'Indice de Guerre des Prix', 'W(t) = (1/N) × Σ|(Pi,t / Pi,t−1) − 1|', '6.1%', 3.4, 5.7,
+      'Intensité de la concurrence tarifaire.',
+      "Mesure l'intensité des comportements de prix concurrentiels. Des valeurs élevées indiquent des ajustements de prix agressifs.",
+      _up(5.2, 6.1), false),
+  Indicator('promo', 'Indice de Pression Promotionnelle', 'PP(t) = (Produits en baisse de prix) / N', '18.3%', 1.2, 6.8,
+      'Activité promotionnelle du marché.',
+      "Mesure la proportion de produits actuellement en baisse de prix. C'est un indicateur utile de l'activité promotionnelle.",
+      _up(15.1, 18.3), false),
+  Indicator('increase', 'Indice de Hausse des Prix', 'PH(t) = (Produits en hausse de prix) / N', '12.6%', 0.8, 3.1,
+      'Pression haussière sur les prix.',
+      'Mesure la part des produits dont les prix ont augmenté. Il reflète la pression haussière sur les prix au sein du marché.',
+      _up(11.4, 12.6), false),
+  Indicator('stability', 'Indice de Stabilité des Prix', 'S(t) = 1 − (SKUs modifiés / N)', '74.2%', -0.4, -2.2,
+      'Stabilité globale des prix.',
+      'Mesure la proportion de produits dont les prix sont restés inchangés. Des valeurs élevées indiquent un marché plus stable.',
+      const [77.1, 76.4, 75.8, 75.2, 74.9, 74.6, 74.4, 74.3, 74.2], true),
+  Indicator('churn', 'Indice de Renouvellement Produits', 'C(t) = (Nouveaux SKUs) / N', '3.4%', 0.6, 1.9,
+      'Arrivée de nouveaux produits.',
+      'Mesure le rythme auquel de nouveaux produits entrent sur le marché. Il aide à suivre le dynamisme de la marketplace.',
+      _up(2.7, 3.4), true),
+  Indicator('exit', 'Indice de Sortie de Produits', 'E(t) = (SKUs retirés) / N', '2.1%', 0.2, 0.7,
+      'Retrait de produits du marché.',
+      'Mesure le rythme auquel les produits disparaissent du catalogue suivi. Il peut signaler des ruptures ou arrêts de produits.',
+      _up(1.8, 2.1), false),
+  Indicator('competitiveness', 'Indice de Compétitivité', 'CI(t) = Σ|Pi,t − Pi,t−1| / ΣPi,t−1', '5.8%', 1.5, 2.4,
+      'Intensité concurrentielle globale.',
+      "Mesure l'intensité globale de la concurrence par les prix sur le marché. Des valeurs élevées suggèrent un comportement plus agressif.",
+      _up(5.1, 5.8), false),
+  Indicator('convergence', 'Indice de Convergence du Marché', 'K(t) = 1 − σ(P) / μ(P)', '0.66', 0.3, 1.2,
+      'Maturité et cohérence des prix.',
+      'Mesure le degré de convergence des prix vers un niveau commun. Des valeurs élevées indiquent un marché plus mature et efficient.',
+      _up(0.63, 0.66), true),
+];
+
+// Section — évolution des indices par catégorie (12 mois).
+class CatTrend {
+  final String name;
+  final Color color;
+  final List<double> values; // 12 mois
+  const CatTrend(this.name, this.color, this.values);
+}
+
+final categoryTrends = <CatTrend>[
+  CatTrend('Électronique', const Color(0xFF49885B), List.generate(12, (i) => (100 + i * 1.1 + sin(i / 2) * 1.5) * 10 ~/ 1 / 10)),
+  CatTrend('Mode', const Color(0xFF9FCFA9), List.generate(12, (i) => (100 + i * 0.6 + cos(i / 2) * 2) * 10 ~/ 1 / 10)),
+  CatTrend('Maison & Déco', const Color(0xFF22C993), List.generate(12, (i) => (100 + i * 0.4 + sin(i / 3) * 1.2) * 10 ~/ 1 / 10)),
+  CatTrend('Alimentation', const Color(0xFFF7A23B), List.generate(12, (i) => (100 + i * 1.4 + cos(i / 1.8) * 1) * 10 ~/ 1 / 10)),
+  CatTrend('Beauté', const Color(0xFFE11D74), List.generate(12, (i) => (100 + i * 0.8 + sin(i / 2.4) * 1.8) * 10 ~/ 1 / 10)),
+];
+
+const indexMonths = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];

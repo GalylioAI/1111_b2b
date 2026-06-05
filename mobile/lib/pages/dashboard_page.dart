@@ -41,10 +41,8 @@ class DashboardPage extends StatelessWidget {
                     _legendDot(c.accent3, 'Vous', c),
                   ])),
               AreaLineChart(
-                minY: 90,
-                maxY: 120,
-                yTicks: const [95, 105, 115],
                 height: 220,
+                xLabels: [for (final p in priceIndex) 'J${p['day']}'],
                 seriesLabels: const ['Vous', 'Marché'],
                 decimals: 1,
                 series: [

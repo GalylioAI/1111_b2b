@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../data/mock.dart';
 import '../pages/dashboard_page.dart';
+import '../pages/indices_page.dart';
 import '../pages/tracking_page.dart';
 import '../pages/comparison_page.dart';
 import '../pages/catalog_page.dart';
@@ -22,6 +23,7 @@ class NavDest {
 
 const allDests = <NavDest>[
   NavDest('dashboard', 'Tableau de bord', Icons.dashboard_rounded),
+  NavDest('indices', 'Indices Marché', Icons.show_chart_rounded),
   NavDest('tracking', 'Suivi des prix', Icons.sell_rounded),
   NavDest('comparison', 'Comparaison', Icons.balance_rounded),
   NavDest('catalog', 'Catalogue', Icons.inventory_2_rounded),
@@ -48,6 +50,7 @@ class _AppShellState extends State<AppShell> {
 
   Widget _pageFor(String r) {
     switch (r) {
+      case 'indices': return const IndicesPage();
       case 'tracking': return const TrackingPage();
       case 'comparison': return const ComparisonPage();
       case 'catalog': return const CatalogPage();

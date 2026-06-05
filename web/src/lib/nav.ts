@@ -5,6 +5,7 @@ import {
   Boxes,
   Bell,
   ChartColumnIncreasing,
+  Activity,
   Search,
   Truck,
   FileText,
@@ -26,6 +27,7 @@ export const navItems: NavItem[] = [
   { label: "Catalogue", href: "/catalog", icon: Boxes },
   { label: "Alertes & Watchlist", href: "/alerts", icon: Bell },
   { label: "Analytics & BI", href: "/analytics", icon: ChartColumnIncreasing },
+  { label: "Indices Marché", href: "/indices", icon: Activity },
   { label: "SEO Intelligence", href: "/seo", icon: Search },
   { label: "Fournisseurs", href: "/suppliers", icon: Truck },
   { label: "Rapports", href: "/reports", icon: FileText },
@@ -40,6 +42,6 @@ export const bottomNavItems: NavItem[] = [
 export const topTabs = [
   { label: "Vue d'ensemble", href: "/" },
   { label: "Suivi des prix", href: "/tracking" },
-  { label: "Analytics", href: "/analytics" },
+  { label: "Indices Marché", href: "/indices" },
   { label: "Tarifs", href: "/pricing" },
 ];

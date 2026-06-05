@@ -16,7 +16,10 @@ import { motion } from "framer-motion";
 import { MoreHorizontal, ChevronDown } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { ClientOnly } from "@/components/ui/ClientOnly";
+import { niceAxis } from "@/lib/axis";
 import { priceIndex, priceIndexPeak } from "@/lib/b2b";
+
+const piAxis = niceAxis(priceIndex.flatMap((d) => [d.market, d.you]));
 
 function Callout() {
   return (
@@ -154,8 +157,9 @@ export function PriceIndexChart() {
                 dy={8}
               />
               <YAxis
-                domain={[90, 120]}
-                ticks={[95, 105, 115]}
+                domain={[piAxis.min, piAxis.max]}
+                ticks={piAxis.ticks}
+                tickFormatter={(v: number) => v.toFixed(piAxis.decimals)}
                 tickLine={false}
                 axisLine={false}
                 tick={{ fontSize: 11, fill: "var(--ink-3)" }}

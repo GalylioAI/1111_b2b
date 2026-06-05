@@ -93,7 +93,7 @@ class AnalyticsPage extends StatelessWidget {
                 _lg(c.accent, 'Élec.', c), const SizedBox(width: 8), _lg(c.accent3, 'Mode', c),
               ])),
               AreaLineChart(
-                minY: 90, maxY: 112, yTicks: const [95, 105], height: 200,
+                height: 200,
                 xLabels: [for (final m in marketTrend) m['month'] as String],
                 seriesLabels: const ['Mode', 'Élec.'],
                 decimals: 1,

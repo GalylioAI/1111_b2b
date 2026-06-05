@@ -15,7 +15,10 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { ClientOnly } from "@/components/ui/ClientOnly";
 import { Donut } from "@/components/b2b/Donut";
+import { niceAxis } from "@/lib/axis";
 import { heatmap, marketTrend, stabilityIndex, marketShare } from "@/lib/b2b";
+
+const trendAxis = niceAxis(marketTrend.flatMap((d) => [d.electronique, d.mode]));
 
 function cellStyle(v: number) {
   const diff = v - 100;
@@ -121,7 +124,7 @@ export default function AnalyticsPage() {
                   </defs>
                   <CartesianGrid vertical={false} strokeDasharray="4 6" />
                   <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "var(--ink-3)" }} dy={8} />
-                  <YAxis domain={[90, 112]} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "var(--ink-3)" }} width={40} />
+                  <YAxis domain={[trendAxis.min, trendAxis.max]} ticks={trendAxis.ticks} tickFormatter={(v: number) => v.toFixed(trendAxis.decimals)} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "var(--ink-3)" }} width={40} />
                   <Tooltip
                     contentStyle={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 12, fontSize: 12 }}
                     labelStyle={{ color: "var(--ink)" }}
