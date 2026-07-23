@@ -16,12 +16,12 @@ function RailLink({ item, active }: { item: NavItem; active: boolean }) {
     <Link
       href={item.href}
       aria-label={item.label}
-      className="group/link relative flex h-11 w-full items-center gap-3 rounded-2xl pl-[18px] pr-3"
+      className="group/link relative flex h-11 w-full items-center gap-3 rounded-2xl pl-[18px] pr-3 transition-colors hover:bg-surface2/70"
     >
       {active && (
         <motion.span
           layoutId="rail-active"
-          className="absolute inset-0 rounded-2xl accent-gradient shadow-[0_10px_24px_-8px_var(--accent-glow)]"
+          className="absolute inset-0 rounded-2xl accent-gradient shadow-[0_12px_28px_-8px_var(--accent-glow),inset_0_1px_0_rgba(255,255,255,0.18)]"
           transition={{ type: "spring", stiffness: 480, damping: 38 }}
         />
       )}
@@ -46,7 +46,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="group themed fixed inset-y-0 left-0 z-40 hidden w-[76px] flex-col overflow-hidden border-r border-line bg-rail py-5 transition-[width,box-shadow] duration-300 ease-out hover:w-[244px] hover:shadow-[20px_0_50px_-20px_rgba(0,0,0,0.35)] md:flex">
+    <aside className="group themed fixed inset-y-0 left-0 z-40 hidden w-[76px] flex-col overflow-hidden border-r border-line bg-rail py-5 transition-[width,box-shadow] duration-300 ease-out [background-image:radial-gradient(220px_200px_at_18px_28px,var(--accent-soft),transparent_72%)] hover:w-[244px] hover:shadow-[20px_0_50px_-20px_rgba(0,0,0,0.35)] md:flex">
       {/* Brand */}
       <Link href="/" aria-label="1111.tn" className="mb-7 flex items-center gap-3 pl-[18px] pr-3">
         <motion.span
@@ -60,7 +60,7 @@ export function Sidebar() {
         </motion.span>
         <span className="whitespace-nowrap leading-none opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <span className="block font-display text-[15px] font-bold tracking-tight text-ink">
-            1111<span className="text-accent">.tn</span>
+            1111<span className="gradient-text-gold">.tn</span>
           </span>
           <span className="mt-0.5 block text-[10px] font-medium tracking-[0.16em] text-ink3">
             PRICE INTELLIGENCE

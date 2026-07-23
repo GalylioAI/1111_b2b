@@ -65,10 +65,10 @@ export function GlobalIndexCard() {
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-      className="card relative overflow-hidden p-5 sm:p-6"
+      className="card card-feature relative overflow-hidden p-5 sm:p-6"
     >
       {/* ambient glow */}
-      <span className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-accent/15 blur-3xl" />
+      <span className="animate-glow-pulse pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-accent/20 blur-3xl" />
 
       {/* header */}
       <header className="relative mb-5 flex flex-wrap items-start justify-between gap-4">
@@ -159,7 +159,7 @@ export function GlobalIndexCard() {
         </div>
 
         {/* chart */}
-        <div className="relative h-[260px] w-full">
+        <div className="chart-glow relative h-[260px] w-full">
           <div className="pointer-events-none absolute left-[78%] top-1 z-10 -translate-x-1/2">
             <motion.div
               initial={{ opacity: 0, y: -10, scale: 0.9 }}
@@ -179,7 +179,8 @@ export function GlobalIndexCard() {
               <AreaChart data={globalIndexSeries} margin={{ top: 10, right: 8, left: -14, bottom: 0 }}>
                 <defs>
                   <linearGradient id="giFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.32} />
+                    <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.4} />
+                    <stop offset="55%" stopColor="var(--accent)" stopOpacity={0.12} />
                     <stop offset="100%" stopColor="var(--accent)" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="giStroke" x1="0" y1="0" x2="1" y2="0">

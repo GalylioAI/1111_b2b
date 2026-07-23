@@ -12,6 +12,8 @@ type CardProps = {
   children: React.ReactNode;
   delay?: number;
   hover?: boolean;
+  /* Adds the glowing animated gradient ring for hero / spotlight cards */
+  feature?: boolean;
 };
 
 export function Card({
@@ -23,13 +25,14 @@ export function Card({
   children,
   delay = 0,
   hover = true,
+  feature = false,
 }: CardProps) {
   return (
     <motion.section
-      initial={{ opacity: 0, y: 18 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 18, filter: "blur(6px)" }}
+      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={`card ${hover ? "card-hover" : ""} p-5 sm:p-6 ${className}`}
+      className={`card ${feature ? "card-feature" : ""} ${hover ? "card-hover" : ""} p-5 sm:p-6 ${className}`}
     >
       {(title || action) && (
         <header className="mb-5 flex items-center justify-between gap-3">

@@ -78,6 +78,7 @@ export function PriceIndexChart() {
 
   return (
     <Card
+      feature
       title="Indice de prix du marché"
       action={
         <div className="flex items-center gap-3">
@@ -123,7 +124,7 @@ export function PriceIndexChart() {
         </div>
       }
     >
-      <div className="relative h-[290px] w-full">
+      <div className="chart-glow relative h-[290px] w-full">
         <div className="pointer-events-none absolute left-[58%] top-1 z-10 -translate-x-1/2">
           <motion.div
             initial={{ opacity: 0, y: -10, scale: 0.9 }}
@@ -139,7 +140,8 @@ export function PriceIndexChart() {
             <AreaChart data={priceIndex} margin={{ top: 10, right: 8, left: -12, bottom: 0 }}>
               <defs>
                 <linearGradient id="mktFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.3} />
+                  <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.38} />
+                  <stop offset="55%" stopColor="var(--accent)" stopOpacity={0.1} />
                   <stop offset="100%" stopColor="var(--accent)" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="mktStroke" x1="0" y1="0" x2="1" y2="0">
